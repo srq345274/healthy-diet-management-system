@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import { API_BASE } from '../../../utils/config.js'
 export default {
   data() {
     return {
@@ -70,7 +71,7 @@ export default {
 
         // 3. 调用后端【微信快捷登录】接口
         const { data } = await uni.request({
-          url: "http://127.0.0.1:8080/api/user/wx/phone-login",
+          url: API_BASE + "/api/user/wx/phone-login",
           method: "POST",
           header: {
             "content-type": "application/json"
@@ -119,7 +120,7 @@ export default {
 
       try {
         await uni.request({
-          url: "http://127.0.0.1:8080/api/user/update-nickname",
+          url: API_BASE + "/api/user/update-nickname",
           method: "POST",
           header: {
             "token": this.token,
