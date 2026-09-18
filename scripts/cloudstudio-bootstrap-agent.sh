@@ -36,14 +36,70 @@ if [ -z "$PYTHON_BIN" ]; then
   fi
 fi
 
-if command -v sshd >/dev/null 2>&1; then
-  SSHD_BIN="$(command -v sshd)"
-elif [ -x /usr/sbin/sshd ]; then
-  SSHD_BIN=/usr/sbin/sshd
-elif [ -x /usr/local/sbin/sshd ]; then
-  SSHD_BIN=/usr/local/sbin/sshd
-else
-  echo "Missing required command: sshd. Install or enable OpenSSH server in this Cloud Studio workspace." >&2
+find_sshd() {
+  if command -v sshd >/dev/null 2>&1; then
+    command -v sshd
+  elif [ -x /usr/sbin/sshd ]; then
+    printf '%s\n' /usr/sbin/sshd
+  elif [ -x /usr/local/sbin/sshd ]; then
+    printf '%s\n' /usr/local/sbin/sshd
+  fi
+}
+
+install_sshd() {
+  if command -v apt-get >/dev/null 2>&1; then
+    if [ "$(id -u)" -eq 0 ]; then
+      apt-get update
+      apt-get install -y openssh-server openssh-client
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+      sudo apt-get update
+      sudo apt-get install -y openssh-server openssh-client
+    else
+      return 1
+    fi
+  elif command -v apk >/dev/null 2>&1; then
+    if [ "$(id -u)" -eq 0 ]; then
+      apk add --no-cache openssh
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+      sudo apk add --no-cache openssh
+    else
+      return 1
+    fi
+  elif command -v dnf >/dev/null 2>&1; then
+    if [ "$(id -u)" -eq 0 ]; then
+      dnf install -y openssh-server openssh-clients
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+      sudo dnf install -y openssh-server openssh-clients
+    else
+      return 1
+    fi
+  elif command -v yum >/dev/null 2>&1; then
+    if [ "$(id -u)" -eq 0 ]; then
+      yum install -y openssh-server openssh-clients
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+      sudo yum install -y openssh-server openssh-clients
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+SSHD_BIN="$(find_sshd || true)"
+if [ -z "$SSHD_BIN" ] && [ "${INSTALL_OPENSSH_SERVER:-0}" = "1" ]; then
+  install_sshd || true
+  SSHD_BIN="$(find_sshd || true)"
+fi
+
+if [ -z "$SSHD_BIN" ]; then
+  echo "OpenSSH server (sshd) is not available in this Cloud Studio workspace." >&2
+  echo "Current user: $(id -un 2>/dev/null || printf unknown); uid: $(id -u 2>/dev/null || printf unknown)" >&2
+  echo "Package managers: apt-get=$(command -v apt-get || printf no), apk=$(command -v apk || printf no), dnf=$(command -v dnf || printf no), yum=$(command -v yum || printf no)" >&2
+  echo "If you have permission to install packages, retry from /workspace with:" >&2
+  echo "  export INSTALL_OPENSSH_SERVER=1" >&2
+  echo "  curl -fsSL https://raw.githubusercontent.com/srq345274/healthy-diet-management-system/main/scripts/cloudstudio-bootstrap-agent.sh | bash" >&2
+  echo "If installation is not permitted, ask Cloud Studio to use a workspace image with openssh-server enabled." >&2
   exit 3
 fi
 
