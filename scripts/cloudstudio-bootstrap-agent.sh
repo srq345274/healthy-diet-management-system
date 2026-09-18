@@ -106,11 +106,28 @@ fi
 mkdir -p "$AGENT_DIR" "$STATE_DIR"
 chmod 700 "$STATE_DIR"
 
+normalize_repo_url() {
+  printf '%s' "$1" | sed -E 's#/$##; s#\.git$##'
+}
+
 if [ -d "$PROJECT_DIR/.git" ]; then
+  CURRENT_ORIGIN="$(git -C "$PROJECT_DIR" remote get-url origin 2>/dev/null || true)"
+  if [ -z "$CURRENT_ORIGIN" ]; then
+    echo "PROJECT_DIR has no origin remote: $PROJECT_DIR" >&2
+    echo "Set PROJECT_DIR to the uploaded healthy-diet-management-system checkout." >&2
+    exit 4
+  fi
+  if [ "$(normalize_repo_url "$CURRENT_ORIGIN")" != "$(normalize_repo_url "$REPO_URL")" ]; then
+    echo "PROJECT_DIR points to a different repository." >&2
+    echo "current_origin=$CURRENT_ORIGIN" >&2
+    echo "expected_origin=$REPO_URL" >&2
+    echo "Use PROJECT_DIR=/workspace/healthy-diet-management-system and retry." >&2
+    exit 5
+  fi
   git -C "$PROJECT_DIR" fetch origin main
   git -C "$PROJECT_DIR" checkout main
   git -C "$PROJECT_DIR" pull --ff-only origin main
-elif [ -z "$(find "$PROJECT_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+elif [ ! -e "$PROJECT_DIR" ] || [ -z "$(find "$PROJECT_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
   git clone "$REPO_URL" "$PROJECT_DIR"
 else
   echo "PROJECT_DIR is not a Git checkout and is not empty: $PROJECT_DIR" >&2
@@ -215,6 +232,11 @@ port_listening() {
     return 1
   fi
 }
+
+if [ "$(id -u)" -eq 0 ]; then
+  mkdir -p /run/sshd
+  chmod 755 /run/sshd
+fi
 
 "$SSHD_BIN" -t -f "$STATE_DIR/sshd_config"
 if ! port_listening "$SSH_PORT"; then
