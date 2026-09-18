@@ -26,6 +26,7 @@ public class WebConfig {
         reg.addInitParameter(
                 "exclusions",
                 String.join(",",
+                        "/api/health",
                         "/api/email/send-code",
                         "/api/email/check-email-exists",
                         "/api/auth/email-register",

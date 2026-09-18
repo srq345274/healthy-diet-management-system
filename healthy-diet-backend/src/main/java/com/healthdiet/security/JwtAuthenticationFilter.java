@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 白名单接口（和前端 URL 完全对应）
     private static final List<String> WHITELIST = List.of(
+            "/api/health",
             "/api/email/send-code",
             "/api/email/check-email-exists",
             "/api/auth/email-register",
@@ -79,3 +80,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+
+

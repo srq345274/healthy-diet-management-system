@@ -1,0 +1,37 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:healthy_diet;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=USER,LIST
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: true
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+healthdiet:
+  jwt:
+    secret: ${JWT_SECRET:PleaseChangeThisToAVeryLongRandomSecretKeyForHS256AtLeast256BitsRecommended1234567890}
+    expiration-ms: 86400000
+  doubao:
+    api-key: ${DOUBAO_API_KEY:}
+    endpoint: ${DOUBAO_ENDPOINT:https://ark.cn-beijing.volces.com/api/v3/chat/completions}
+    model: ${DOUBAO_MODEL:doubao-1-5-vision-pro-32k-250115}
+    cutoutModel: ${DOUBAO_CUTOUT_MODEL:doubao-seededit-3-0-i2i-250628}
+
+wechat:
+  miniapp:
+    appid: ${WECHAT_MINIAPP_APPID:}
+    secret: ${WECHAT_MINIAPP_SECRET:}

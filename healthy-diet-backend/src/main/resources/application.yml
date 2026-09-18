@@ -5,7 +5,7 @@ spring:
   application:
     name: healthy-diet-backend
   datasource:
-    url: jdbc:mysql://localhost:3306/diet_app?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: ${DB_URL:jdbc:mysql://localhost:3306/healthy_diet?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -50,3 +50,4 @@ wechat:
   miniapp:
     appid: ${WECHAT_MINIAPP_APPID:}
     secret: ${WECHAT_MINIAPP_SECRET:}
+

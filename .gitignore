@@ -9,7 +9,8 @@ unpackage/
 
 # IDE and OS files
 .idea/
-.vscode/
+.vscode/*
+!.vscode/preview.yml
 .DS_Store
 Thumbs.db
 
