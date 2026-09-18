@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+target/
+dist/
+build/
+unpackage/
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local environment overrides
+.env
+.env.*
+*.local
+application-local.yml
+application-local.yaml
+application-dev.yml
+application-dev.yaml
+
+
+# Generated archives
+*.zip

@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: healthy-diet-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/diet_app?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+healthdiet:
+  jwt:
+    secret: ${JWT_SECRET:PleaseChangeThisToAVeryLongRandomSecretKeyForHS256AtLeast256BitsRecommended1234567890}
+    expiration-ms: 86400000
+  doubao:
+    api-key: ${DOUBAO_API_KEY:}
+    endpoint: ${DOUBAO_ENDPOINT:https://ark.cn-beijing.volces.com/api/v3/chat/completions}
+    model: ${DOUBAO_MODEL:doubao-1-5-vision-pro-32k-250115}
+    cutoutModel: ${DOUBAO_CUTOUT_MODEL:doubao-seededit-3-0-i2i-250628}
+
+logging:
+  level:
+    com.healthdiet: INFO
+
+wechat:
+  miniapp:
+    appid: ${WECHAT_MINIAPP_APPID:}
+    secret: ${WECHAT_MINIAPP_SECRET:}
