@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/srq345274/healthy-diet-management-system.git}"
-PROJECT_DIR="${PROJECT_DIR:-$HOME/healthy-diet-management-system}"
+PROJECT_DIR="${PROJECT_DIR:-$PWD}"
 AGENT_DIR="${AGENT_DIR:-$HOME/.cloudstudio-agent}"
 STATE_DIR="$AGENT_DIR/state"
 BRIDGE_PORT="${BRIDGE_PORT:-18765}"
@@ -54,8 +54,12 @@ if [ -d "$PROJECT_DIR/.git" ]; then
   git -C "$PROJECT_DIR" fetch origin main
   git -C "$PROJECT_DIR" checkout main
   git -C "$PROJECT_DIR" pull --ff-only origin main
-else
+elif [ -z "$(find "$PROJECT_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
   git clone "$REPO_URL" "$PROJECT_DIR"
+else
+  echo "PROJECT_DIR is not a Git checkout and is not empty: $PROJECT_DIR" >&2
+  echo "Set PROJECT_DIR to the uploaded project directory or clone the repository there first." >&2
+  exit 4
 fi
 
 cat > "$AGENT_DIR/bridge.py" <<'PY'
